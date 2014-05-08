@@ -1,0 +1,336 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+	<head>
+		<title>Meeting Reservation System</title>
+
+		<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+		<meta http-equiv="description" content="this is my page">
+		<meta http-equiv="content-type"
+			content="text/html; charset=ISO-8859-1">
+
+		<!--<link rel="stylesheet" type="text/css" href="./styles.css">-->
+		<link rel='stylesheet' href='cal/cupertino/jquery-ui.min.css' />
+		<link href='cal/fullcalendar/fullcalendar.css' rel='stylesheet' />
+		<link href='cal/fullcalendar/fullcalendar.print.css' rel='stylesheet' media='print' />
+		<script src='cal/lib/jquery.min.js'></script>
+		<script src='cal/lib/jquery-ui.custom.min.js'></script>
+		<script src='cal/fullcalendar/fullcalendar.min.js'></script>	
+	
+	
+		<link rel="stylesheet" href="jqx/jqwidgets/styles/jqx.base.css" type="text/css" />
+   		<link rel="stylesheet" href="jqx/jqwidgets/styles/jqx.ui-redmond.css" type="text/css" />
+	    <script type="text/javascript" src="jqx/scripts/demos.js"></script>
+	    <script type="text/javascript" src="jqx/jqwidgets/jqxcore.js"></script>
+	    <script type="text/javascript" src="jqx/jqwidgets/jqxbuttons.js"></script>
+   		<script type="text/javascript" src="jqx/jqwidgets/jqxtabs.js"></script>
+   		<script type="text/javascript" src="jqx/jqwidgets/jqxdatetimeinput.js"></script>
+	    <script type="text/javascript" src="jqx/jqwidgets/jqxcalendar.js"></script>
+	    <script type="text/javascript" src="jqx/jqwidgets/jqxtooltip.js"></script>
+	    <script type="text/javascript" src="jqx/jqwidgets/globalization/globalize.js"></script>
+	    <script type="text/javascript" src="jqx/jqwidgets/jqxwindow.js"></script>
+		<script type="text/javascript" src="jqx/jqwidgets/jqxinput.js"></script>
+	   	<script type="text/javascript" src="jqx/jqwidgets/jqxscrollbar.js"></script>
+	    <script type="text/javascript" src="jqx/jqwidgets/jqxlistbox.js"></script>
+	    <script type="text/javascript" src="jqx/jqwidgets/jqxcheckbox.js"></script>
+	    <script type="text/javascript" src="jqx/jqwidgets/jqxradiobutton.js"></script>
+    	<script type="text/javascript" src="jqx/jqwidgets/jqxdatetimeinput.js"></script>
+	        
+	<style>
+		table
+		{
+		border:1.5px solid 139EFF;
+		}
+	</style>    
+	<script>
+		$(document).ready(function() {
+		
+		//create full calendar
+		$('#calendar').fullCalendar({
+			theme: true,
+			culture: 'en-US',
+			defaultView:'agendaWeek',
+			header: {
+				left: 'prev,next today',
+				center: 'title',
+				right: 'month,agendaWeek,agendaDay'
+			},
+			editable: true,
+			dayClick: function(calEvent, jsEvent, view){
+				_personalSchedule();
+			},
+			eventClick: function(calEvent, jsEvent, view){
+				_checkMeeting();
+			},
+			eventSources:[{
+				allDayDefault: false,
+				url: 'servlet/EmployeeController?command=2',
+				color:'blue'	
+			},{
+				allDayDefault: false,
+				url: 'servlet/EmployeeController?command=3',
+				color:'green'	
+			}] ,
+		});
+		
+		
+		//create toolbar
+		$("#Btn_addEvent").jqxButton({ width: '170', height:'50', theme:'ui-redmond'});
+		$("#Btn_ManagePersonalSchedule").jqxButton({ width: '170', height:'50', theme:'ui-redmond'});
+		$("#Btn_addEvent").on('click', function () {
+              alert(" Btn_addEvent is clicked");
+              _addMeeting();
+          });
+        $("#Btn_ManagePersonalSchedule").on('click', function () {
+              alert(" Btn_ManagePersonalSchedule is clicked");
+          });
+        //create tab panel
+        $('#tabPanel').jqxTabs({ width: '99.5%',height: 715, position: 'top', theme: 'ui-redmond' ,animationType : 'fade', selectionTracker: true});
+		$("#datePicker").jqxCalendar({width: '98%', height: 300, theme: 'ui-redmond'});
+		$('#datePicker').on('change viewChange', function (event) {
+                var date = event.args.date;
+                $('#calendar').fullCalendar('gotoDate',date);
+            });     
+        //create add meeting window
+		//test data
+		var source1 = ["Andy","Jimmy","Randy","Lame of God","Simple Plan"];
+		var source2 = ["1:00P.M","2:00P.M","3:00P.M","4:00P.M","5:00P.M"];
+		var source3 = ["101","102","103","114","116"];       
+		$('#addEventWindow').jqxWindow({
+	        showCollapseButton: true, height:670, maxHeight:800, width: 650, theme:'ui-redmond',resizable:false, autoOpen:false,
+	        initContent: function () {
+	           $("#addEventWindow_titleInput").jqxInput({placeHolder: "Please enter a title", height: 25, width: 400, minLength: 1,theme:'ui-redmond'});
+	           $("#addEventWindow_attendees").jqxListBox({width: 400, source: source1, checkboxes: true, height: 100,theme:'ui-redmond'});
+	           $("#addEventWindow_startTime").jqxListBox({width: 400, source: source2, height: 100,theme:'ui-redmond'});
+	           $("#addEventWindow_dateSelector").jqxDateTimeInput({width: 400, height: '25px',theme:'ui-redmond'});
+	           $("#addEventWindow_endTime").jqxListBox({width: 400, source: source2, height: 100,theme:'ui-redmond'});
+	           $("#addEventWindow_roomSelector").jqxListBox({width: 400, source: source3, height: 100,theme:'ui-redmond'});
+	           $("#addEventWindow_Btn_confirm").jqxButton({ width: '150',theme:'ui-redmond'});
+	           $("#addEventWindow_Btn_cancle").jqxButton({ width: '150',theme:'ui-redmond'});
+	           $('#addEventWindow').jqxWindow('focus');
+	           }
+	      });
+	    $('#addEventWindow').on('open', function (event){
+	    	$.get('servlet/EmployeeController?command=4', function(responseText) {
+            	
+            });	
+	    });    
+		$("#addEventWindow_Btn_confirm").on('click', function () {
+              alert(" Add Event is Confirmed");
+              $('#addEventWindow').jqxWindow('close');
+          });
+		$("#addEventWindow_Btn_cancle").on('click', function () {
+             $('#addEventWindow').jqxWindow('close');
+          });
+          
+        //create profile 
+         $("#name").jqxInput({ height: 25, width: 200, minLength: 1,theme:'ui-redmond'});
+         $("#email").jqxInput({ height: 25, width: 200, minLength: 1,theme:'ui-redmond'});
+         $('#name').val('Simple Plan');
+         $('#email').val('SimplePlan@gmail.com');
+         $("#Btn_updateProfile").jqxButton({ width: '70',theme:'ui-redmond'});
+         $("#Btn_resetProfile").jqxButton({ width: '70',theme:'ui-redmond'});
+         $("#Btn_updateProfile").on('click', function () {
+              alert(" Profile is Updated");
+          });
+         $("#Btn_resetProfile").on('click', function () {
+             alert(" Profile is reset")
+          });
+		  
+		  //add personal schedule
+		  $('#addPersonalScheduleWindow').jqxWindow({
+	        showCollapseButton: true, height: 500, width: 650,theme:'ui-redmond',resizable:false, autoOpen:false,
+	        initContent: function () {
+	           $("#addPersonalScheduleWindow_eventInput").jqxInput({placeHolder: "Please enter a title", height: 25, width: 400, minLength: 1,theme:'ui-redmond'});
+	           $("#addPersonalScheduleWindow_peronsal_TimeSelector1").jqxListBox({width: 400, source: source2, height: 100,theme:'ui-redmond'});
+			   $("#addPersonalScheduleWindow_peronsal_TimeSelector2").jqxListBox({width: 400, source: source2, height: 100,theme:'ui-redmond'});
+	           $("#addPersonalScheduleWindow_visible_1").jqxRadioButton({width: 250, height: 25,checked:true, theme:'ui-redmond'});
+			   $("#addPersonalScheduleWindow_visible_2").jqxRadioButton({width: 250, height: 25,checked:false, theme:'ui-redmond'});
+	           $("#addPersonalScheduleWindow_Btn_personal_Confirm").jqxButton({ width: '150',theme:'ui-redmond'});
+	           $("#addPersonalScheduleWindow_Btn_personal_Cancle").jqxButton({ width: '150',theme:'ui-redmond'});
+	           $('#addEventWindow').jqxWindow('focus');
+	           }
+	      });
+	      
+	      //check meeting schedule panel to be added here
+	      
+	      //maybe check personal schedule panel to be added here
+	      
+	      //get profile
+	});
+	
+	function _addMeeting(){
+	 	$("#addEventWindow").jqxWindow('open');
+	}	
+	function _personalSchedule(){
+		$("#addPersonalScheduleWindow").jqxWindow('open');
+	}
+	function _checkMeeting(){
+		alert("Check Meeting");
+	}
+	  
+	</script>
+	</head>
+	<body>
+		<center><table width="70%" cellspacing="0"; border="10">
+			<tr>
+				<td colspan="2">
+					<h1>
+						Welcome to Meeting Reservation System
+					</h1>
+				</td>
+			</tr>
+			<tr valign="top">
+				<td style="width: 25%; text-align: top;">
+                    <div id="toolbar">
+                    	<table>
+                        	<tr>
+                            	<td><input type="button" value="Add Event" id='Btn_addEvent' /></td>
+                                <td><input type="button" value="Time Management" id='Btn_ManagePersonalSchedule' /></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div id='tabPanel'>
+			            <ul>
+			                <li>Meeting</li>
+			                <li>Profile</li>
+			            </ul>
+			            <div>
+			                <div id = "datePicker">
+			                
+			                </div>
+			            </div>
+			            <div>
+			                <div id = "profile">
+			                	<table width="200" border="0" cellspacing="1" cellpadding="0">
+			                	  <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+								  <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+								  <tr>
+								    <td>Name:</td>
+								    <td>&nbsp;</td>
+								    <td><input id = "name" type="text"></input></td>
+								  </tr>
+								  <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+								  <tr>
+								    <td>Email:</td>
+								    <td>&nbsp;</td>
+								    <td><input id = "email" type="text"></td>
+								  </tr>
+								  <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+								  <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+								  <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+								  <tr>
+								    <td><input type="button" value="Update" id='Btn_updateProfile'/></td>
+								    <td>&nbsp;</td>
+								    <td><input type="button" value="Reset" id='Btn_resetProfile' /></td>
+								  </tr>
+								</table>
+			                </div>
+			            </div>
+			        </div>
+				</td>
+				<td style="width: 75%; text-align: top;">
+					<div id="calendar"></div>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<center>
+						Implemented by Group #1
+					</center>
+				</td>
+			</tr>
+		</table></center>
+		
+		<div id="addEventWindow">
+			<div id="addEventWindow_windowHeader">
+                <span>Create Meeting</span>
+            </div>
+            <div  id="addEventWindow_Content">
+           	<table width="630" border="0" cellspacing="1" cellpadding="0">
+			  <tr>
+			    <td>Title:</td>
+			    <td>&nbsp;</td>
+			    <td><input type="text" id="addEventWindow_titleInput"></input></td>
+			  </tr>
+			  <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+			  <tr>
+			    <td>Attendees:</td>
+			    <td>&nbsp;</td>
+			    <td><div id="addEventWindow_attendees"></div></td>
+			  </tr>
+			  <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+			  <tr>
+			    <td>Date:</td>
+			    <td>&nbsp;</td>
+			    <td><div id="addEventWindow_dateSelector"></div></td>
+			  </tr>
+			  <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+			  <tr>
+			    <td>Start Time:</td>
+			    <td>&nbsp;</td>
+			    <td><div id="addEventWindow_startTime"></div></td>
+			  </tr>
+			  <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+			  <tr>
+			    <td>End Time:</td>
+			    <td>&nbsp;</td>
+			    <td><div id="addEventWindow_endTime"></div></td>
+			  </tr>
+			  <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+			  <tr>
+			    <td>Room:</td>
+			    <td>&nbsp;</td>
+			    <td><div id="addEventWindow_roomSelector"></div></td>
+			  </tr>
+			  <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+			  <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+			  <tr>
+			    <td><input type="button" value="Confirm" id='addEventWindow_Btn_confirm'/></td>
+			    <td>&nbsp;</td>
+			    <td><input type="button" value="Cancle" id='addEventWindow_Btn_cancle' /></td>
+			  </tr>
+			</table>
+            </div>
+		</div>
+        <!-- personal Schedule-->
+		<div id="addPersonalScheduleWindow">
+			<div id="addPersonalScheduleWindow_windowHeader">
+                <span>Add a personal schedule</span>
+            </div>
+            <div  id="addPersonalScheduleWindowContent">
+           	<table width="100%" border="0" cellspacing="1" cellpadding="0">
+			  <tr>
+			    <td>Title:</td>
+			    <td>&nbsp;</td>
+			    <td><input type="text" id="addPersonalScheduleWindow_eventInput"></input></td>
+			  </tr>
+			  <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+			  <tr>
+			    <td>Start Time:</td>
+			    <td>&nbsp;</td>
+			    <td><div id="addPersonalScheduleWindow_peronsal_TimeSelector1"></div></td>
+			  </tr>
+              <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+              <tr>
+			    <td>End Time:</td>
+			    <td>&nbsp;</td>
+			    <td><div id="addPersonalScheduleWindow_peronsal_TimeSelector2"></div></td>
+			  </tr>
+			  <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+			  <tr>
+			    <td>Option:</td>
+			    <td>&nbsp;</td>
+			    <td><div id="addPersonalScheduleWindow_visible_1">visible</div> &nbsp;&nbsp; <div id="addPersonalScheduleWindow_visible_2">Invisible</div> </td>
+			  </tr>
+			  <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+			  <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+			  <tr>
+			    <td><input type="button" value="Confirm" id='addPersonalScheduleWindow_Btn_personal_Confirm'/></td>
+			    <td>&nbsp;</td>
+			    <td><input type="button" value="Cancle" id='addPersonalScheduleWindow_Btn_personal_Cancle' /></td>
+			  </tr>
+			</table>
+            </div>
+		</div>        
+	</body>
+</html>

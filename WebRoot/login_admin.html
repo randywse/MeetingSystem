@@ -1,0 +1,233 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+	<head>
+		<title>Administration</title>
+
+		<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+		<meta http-equiv="description" content="this is my page">
+		<meta http-equiv="content-type"
+			content="text/html; charset=ISO-8859-1">
+
+		<!--<link rel="stylesheet" type="text/css" href="./styles.css">-->
+
+		<style>
+		table {
+			border: 2px solid 139EFF;
+		}
+		</style>
+		<script src='cal/lib/jquery.min.js'></script>
+		<script src='cal/lib/jquery-ui.custom.min.js'></script>
+		<link rel="stylesheet" href="jqx/jqwidgets/styles/jqx.base.css" type="text/css" />
+   		<link rel="stylesheet" href="jqx/jqwidgets/styles/jqx.ui-redmond.css" type="text/css" />
+	    <script type="text/javascript" src="jqx/scripts/demos.js"></script>
+	    <script type="text/javascript" src="jqx/jqwidgets/jqxcore.js"></script>
+	    <script type="text/javascript" src="jqx/jqwidgets/jqxdata.js"></script> 
+   		<script type="text/javascript" src="jqx/jqwidgets/jqxtabs.js"></script>
+   		<script type="text/javascript" src="jqx/jqwidgets/jqxbuttons.js"></script>
+	    <script type="text/javascript" src="jqx/jqwidgets/jqxscrollbar.js"></script>
+	    <script type="text/javascript" src="jqx/jqwidgets/jqxmenu.js"></script>
+	    <script type="text/javascript" src="jqx/jqwidgets/jqxgrid.js"></script>
+	    <script type="text/javascript" src="jqx/jqwidgets/jqxgrid.sort.js"></script>
+	    <script type="text/javascript" src="jqx/jqwidgets/jqxgrid.filter.js"></script>
+	    <script type="text/javascript" src="jqx/jqwidgets/jqxgrid.selection.js"></script> 
+	    <script type="text/javascript" src="jqx/jqwidgets/jqxpanel.js"></script>
+	    <script type="text/javascript" src="jqx/jqwidgets/jqxcheckbox.js"></script>
+	    <script type="text/javascript" src="jqx/jqwidgets/jqxlistbox.js"></script>
+	    <script type="text/javascript" src="jqx/jqwidgets/jqxdropdownlist.js"></script>
+	    <script type="text/javascript" src="jqx/jqwidgets/jqxgrid.pager.js"></script>
+    	<script type="text/javascript" src="jqx/jqwidgets/jqxgrid.edit.js"></script>
+   	<script>
+	$(document).ready(function () {
+	 $('#tabPanel').jqxTabs({ width: '100%', position: 'top', theme:'ui-redmond'});
+	 
+	 //Employee tab
+	 $("#employeeManagement").jqxGrid(
+            {
+            	theme:'ui-redmond',
+                width: '100%',
+                height: 750,
+                //source: dataAdapter,
+                editable: true,
+                sortable: true,
+                showtoolbar: true,
+                filterable: true,
+                pageable: true,
+                altrows: true,
+                columns: [
+                  { text: 'Username',width: '20%' },
+                  { text: 'Password', width: '20%',},
+                  { text: 'Full Name', width: '20%' },
+                  { text: 'Email', width: '30%' },
+                  { text: 'Role',  width: '9.8%' },
+                ],
+                //status bar 
+                showstatusbar: true,
+                renderstatusbar: function (statusbar) {
+                    // appends buttons to the status bar.
+                    var container = $("<div style='overflow: hidden; position: relative; margin: 5px;'></div>");
+                    var addButton = $("<div style='float: left; margin-left: 5px;'><img style='position: relative; margin-top: 2px;' src='jqx/images/add.png'/><span style='margin-left: 4px; position: relative; top: -3px;'>Add</span></div>");
+                    var deleteButton = $("<div style='float: left; margin-left: 5px;'><img style='position: relative; margin-top: 2px;' src='jqx/images/close.png'/><span style='margin-left: 4px; position: relative; top: -3px;'>Delete</span></div>");
+                    var reloadButton = $("<div style='float: left; margin-left: 5px;'><img style='position: relative; margin-top: 2px;' src='jqx/images/refresh.png'/><span style='margin-left: 4px; position: relative; top: -3px;'>Reload</span></div>");     
+                    container.append(addButton);
+                    container.append(deleteButton);
+                    container.append(reloadButton);
+                    statusbar.append(container);
+                    addButton.jqxButton({  width: 60, height: 20 });
+                    deleteButton.jqxButton({  width: 65, height: 20 });
+                    reloadButton.jqxButton({  width: 65, height: 20 });
+                    // add new row.
+                    addButton.click(function (event) {
+                        alert("add new employee")
+                    });
+                    // delete selected row.
+                    deleteButton.click(function (event) {
+                        alert("delete employee")
+                    });
+                    // update grid data.
+                    reloadButton.click(function (event) {
+                        alert("update employee")
+                    });
+                   
+                    },
+                 //search bar
+                 rendertoolbar: function (toolbar) {
+                    var me = this;
+                    var container = $("<div style='margin: 5px;'></div>");
+                    var span = $("<span style='float: left; margin-top: 5px; margin-right: 4px;'>Search Employee: </span>");
+                    var input = $("<input class='jqx-input jqx-widget-content jqx-rc-all' id='searchField' type='text' style='height: 23px; float: left; width: 223px;' />");
+                    toolbar.append(container);
+                    container.append(span);
+                    container.append(input);
+                    if (theme != "") {
+                        input.addClass('jqx-widget-content-' + theme);
+                        input.addClass('jqx-rc-all-' + theme);
+                    }
+                    var oldVal = "";
+                    input.on('keydown', function (event) {
+                        if (input.val().length >= 2) {
+                            if (me.timer) {
+                                clearTimeout(me.timer);
+                            }
+                            if (oldVal != input.val()) {
+                                me.timer = setTimeout(function () {
+                                    $("#jqxgrid").jqxGrid('updatebounddata');
+                                }, 1000);
+                                oldVal = input.val();
+                            }
+                        }
+                    });
+                }
+            });
+             $("#roomManagement").jqxGrid(
+            {
+            	theme:'ui-redmond',
+                width: '100%',
+                height: 750,
+                //source: dataAdapter,
+                editable: true,
+                sortable: true,
+                showtoolbar: true,
+                filterable: true,
+                pageable: true,
+                altrows: true,
+                columns: [
+                  { text: 'Room NO.',width: '20%' },
+                  { text: 'Room Location', width: '20%',},
+                  { text: 'Capacity', width: '20%' },
+                  { text: 'Description', width: '40%' },
+                ],
+                //status bar 
+                showstatusbar: true,
+                renderstatusbar: function (statusbar) {
+                    // appends buttons to the status bar.
+                    var container = $("<div style='overflow: hidden; position: relative; margin: 5px;'></div>");
+                    var addButton = $("<div style='float: left; margin-left: 5px;'><img style='position: relative; margin-top: 2px;' src='jqx/images/add.png'/><span style='margin-left: 4px; position: relative; top: -3px;'>Add</span></div>");
+                    var deleteButton = $("<div style='float: left; margin-left: 5px;'><img style='position: relative; margin-top: 2px;' src='jqx/images/close.png'/><span style='margin-left: 4px; position: relative; top: -3px;'>Delete</span></div>");
+                    var reloadButton = $("<div style='float: left; margin-left: 5px;'><img style='position: relative; margin-top: 2px;' src='jqx/images/refresh.png'/><span style='margin-left: 4px; position: relative; top: -3px;'>Reload</span></div>");     
+                    container.append(addButton);
+                    container.append(deleteButton);
+                    container.append(reloadButton);
+                    statusbar.append(container);
+                    addButton.jqxButton({  width: 60, height: 20 });
+                    deleteButton.jqxButton({  width: 65, height: 20 });
+                    reloadButton.jqxButton({  width: 65, height: 20 });
+                    // add new row.
+                    addButton.click(function (event) {
+                        alert("add new room")
+                    });
+                    // delete selected row.
+                    deleteButton.click(function (event) {
+                        alert("delete room")
+                    });
+                    // update grid data.
+                    reloadButton.click(function (event) {
+                        alert("update room")
+                    });
+                   
+                    },
+                 //search bar
+                 rendertoolbar: function (toolbar) {
+                    var me = this;
+                    var container = $("<div style='margin: 5px;'></div>");
+                    var span = $("<span style='float: left; margin-top: 5px; margin-right: 4px;'>Search Room: </span>");
+                    var input = $("<input class='jqx-input jqx-widget-content jqx-rc-all' id='searchField' type='text' style='height: 23px; float: left; width: 223px;' />");
+                    toolbar.append(container);
+                    container.append(span);
+                    container.append(input);
+                    if (theme != "") {
+                        input.addClass('jqx-widget-content-' + theme);
+                        input.addClass('jqx-rc-all-' + theme);
+                    }
+                    var oldVal = "";
+                    input.on('keydown', function (event) {
+                        if (input.val().length >= 2) {
+                            if (me.timer) {
+                                clearTimeout(me.timer);
+                            }
+                            if (oldVal != input.val()) {
+                                me.timer = setTimeout(function () {
+                                    $("#jqxgrid").jqxGrid('updatebounddata');
+                                }, 1000);
+                                oldVal = input.val();
+                            }
+                        }
+                    });
+                }
+            });
+	});
+	</script>
+	</head>
+	
+	<body>
+		<center>
+			<table width="80%" border="1.5px">
+				<tr>
+					<td colspan="2">
+						<h1>
+							Administration System
+						</h1>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<div id="tabPanel">
+							<ul>
+								<li>Employee Management</li>
+								<li>Room Management</li>
+							</ul>
+							<div id ="employeeManagement"></div>
+							<div id ="roomManagement"></div>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2" style="">
+						<center>
+							Implemented by Group #1
+						</center>
+					</td>
+				</tr>
+			</table>
+		</center>
+	</body>
+</html>
